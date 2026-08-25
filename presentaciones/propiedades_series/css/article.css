@@ -1,0 +1,178 @@
+:root {
+  --text: #1a1a1a;
+  --muted: #555;
+  --accent: #2a76dd;
+  --border: #e0e0e0;
+  --bg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Georgia", "Times New Roman", serif;
+  line-height: 1.65;
+}
+
+.article {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 3em 1.5em 5em;
+}
+
+/* ---------- Header ---------- */
+header.article-header {
+  text-align: center;
+  margin-bottom: 3em;
+  padding-bottom: 2em;
+  border-bottom: 1px solid var(--border);
+}
+
+header.article-header img.logo {
+  height: 55px;
+  margin-bottom: 1.5em;
+}
+
+header.article-header h1 {
+  font-size: 1.9em;
+  margin: 0 0 0.3em;
+  line-height: 1.3;
+}
+
+header.article-header p.subtitle {
+  font-size: 1.05em;
+  color: var(--muted);
+  margin: 0 0 1em;
+  font-style: italic;
+}
+
+header.article-header p.authors {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95em;
+  margin: 0.2em 0;
+}
+
+header.article-header p.affiliation {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.85em;
+  color: var(--muted);
+  margin: 0.2em 0;
+}
+
+header.article-header p.date {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-top: 0.8em;
+}
+
+/* ---------- Abstract ---------- */
+.abstract {
+  background: rgba(42, 118, 221, 0.05);
+  border-left: 4px solid var(--accent);
+  padding: 1em 1.4em;
+  margin-bottom: 2.5em;
+  font-size: 0.95em;
+}
+
+.abstract h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 0 0 0.5em;
+}
+
+/* ---------- Body ---------- */
+article section {
+  margin-bottom: 2.5em;
+}
+
+article h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.3em;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.3em;
+  margin: 0 0 0.8em;
+}
+
+article h3 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.05em;
+  margin: 1.5em 0 0.6em;
+}
+
+article p { margin: 0 0 1em; }
+
+article ul, article ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+
+blockquote.theorem,
+blockquote.definition {
+  border-left: 4px solid var(--accent);
+  padding: 0.3em 1em;
+  margin: 1.2em 0;
+  background: rgba(42, 118, 221, 0.06);
+}
+
+blockquote.theorem p:first-child::before,
+blockquote.definition p:first-child::before {
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.75em;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.3em;
+}
+
+blockquote.theorem p:first-child::before { content: "Teorema"; }
+blockquote.definition p:first-child::before { content: "Definición"; }
+
+figure {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+figure img {
+  max-width: 100%;
+}
+
+figure figcaption {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-top: 0.5em;
+}
+
+.missing-figure {
+  border: 2px dashed #999;
+  padding: 2em;
+  font-size: 0.85em;
+  color: var(--muted);
+  text-align: center;
+}
+
+/* ---------- References ---------- */
+section.references ol {
+  list-style: none;
+  padding-left: 0;
+}
+
+section.references li {
+  font-size: 0.9em;
+  margin-bottom: 0.8em;
+  padding-left: 1.6em;
+  text-indent: -1.6em;
+}
+
+@media (max-width: 600px) {
+  .article { padding: 2em 1em 3em; }
+  header.article-header h1 { font-size: 1.5em; }
+}

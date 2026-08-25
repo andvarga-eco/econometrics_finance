@@ -3,146 +3,150 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Introducción &mdash; Econometría</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/simple.css">
-  <link rel="stylesheet" href="css/custom.css">
+  <title>Propiedades de las series &mdash; Econometría</title>
+  <link rel="stylesheet" href="css/article.css">
 </head>
 <body>
-  <div class="reveal">
-    <div class="slides">
+  <div class="article">
 
-      <!-- ===================== PORTADA ===================== -->
-      <section class="title-slide">
-        <h1>Introducción</h1>
-        <p>Andrés Vargas<br>
-        <small>Departamento de Economía &mdash; Universidad del Norte</small></p>
-        <img src="images/logo-uninorte.png" alt="Logo Universidad del Norte">
-      </section>
+    <!-- ===================== ENCABEZADO ===================== -->
+    <header class="article-header">
+      <img class="logo" src="images/logo-uninorte.png" alt="Logo Universidad del Norte">
+      <h1>Series de tiempo financieras</h1>
+      <p class="subtitle">Retornos y propiedades estadísticas</p>
+      <p class="authors">Andrés Vargas</p>
+      <p class="affiliation">Departamento de Economía &mdash; Universidad del Norte</p>
+      <p class="date">25/08/2026</p>
+    </header>
 
-      <!-- ===================== CONTENIDO ===================== -->
-      <section>
-        <h3>Predicción versus estimación</h3>
-        <p>Considere el siguiente modelo de regresión</p>
-        \[ Y=\beta_XX+\beta_W W+\epsilon \]
-        <p>Al estimar obtenemos \(\hat\beta_X\) y \(\hat\beta_W\), así como \(se(\hat\beta_X)\) y \(se(\hat\beta_W)\). Supongamos que los \(se(\cdot)\) son tales que los coeficientes no son significativos ¿Quiere decir esto que las variables \(X\) y \(W\) no sirven para predecir \(Y\)?</p>
-      </section>
-
-      <section>
-        <img src="images/fig1-3_algorithms.png" alt="fig1-3_algorithms" style="width:80%;"
-             onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/fig1-3_algorithms.png&lt;/div&gt;'">
-      </section>
-
-      <section>
-        <ul>
-          <li>Predicción: nos interesa \(\hat Y\) en relación a \(Y\)</li>
-          <li>Estimación: nos interesa \(\hat\beta\)</li>
-        </ul>
-        <p>La predicción es el dominio de ML. La estimación es el dominio de la econometría</p>
-        <ul>
-          <li>¿Cuándo un problema es de predicción y cuándo de estimación?</li>
-          <li>¿Puede el ML apoyar en problemas de estimación? Sí</li>
-        </ul>
-      </section>
-
-      <section>
-        <h3>Predicción vs causalidad</h3>
-        <p>Considere los siguientes ejemplos, (Kleinberg et al., 2015)</p>
-        <ul>
-          <li>Ante la amenaza de una sequía se debe decidir si se invierte en un baile para la lluvia a fin de aumentar la probabilidad de lluvia</li>
-          <li>Al observar nubes en el cielo debe decidir si lleva la sombrilla para no mojarse en el camino al trabajo</li>
-        </ul>
-        <p>¿Cuál es un problema de predicción y cuál de causalidad?</p>
-      </section>
-
-      <section>
-        <h3>Predicción y causalidad</h3>
-        <p>Sea \(Y\) una variable de resultado que depende de una manera desconocida de la variable \(X_0\). El tomador de decisión debe decidir sobre \(X_0\) con el propósito de maximizar una función de pago \(\pi(X_0,Y)\). La decisión depende de</p>
-        \[ \dfrac{d\pi(X_0,Y)}{dX_0}=\dfrac{\partial\pi}{\partial X_0}(Y)+\dfrac{\partial \pi}{\partial Y}\dfrac{\partial Y}{\partial X_0} \]
-        <p>El primer término requiere predicción, el segundo causalidad</p>
-      </section>
-
-      <section>
-        <h3>Predicción y causalidad</h3>
-        <ul>
-          <li>Baile para la lluvia: causalidad porque no tiene efecto directo en el pago \(\frac{\partial \pi}{\partial X_0}=0\)</li>
-          <li>Sombrilla: predicción pues estas no tienen ningún efecto sobre la lluvia \(\frac{\partial Y}{\partial X_0}=0\)</li>
-        </ul>
-        <p>En el segundo caso, el valor de la acción depende del valor de \(Y\). Requiere bajo error de predicción</p>
-      </section>
-
-      <section>
-        <p>(Mullainathan, 2025) presenta los siguientes casos</p>
-        <ul>
-          <li>En una audiencia previa el juez debe decidir si el acusado debe ser privado o no de la libertad antes del juicio. Existe el riesgo de que el acusado escape o reincida si es dejado libre ¿La decisión del juez afecta la probabilidad de escape o reincidencia?</li>
-          <li>El juez debe decidir si le coloca el brazalete electrónico al acusado ¿La decisión del juez afecta la probabilidad de escape o reincidencia?</li>
-        </ul>
-      </section>
-
-      <section>
-        <img src="images/fig4_algorithm.png" alt="fig4_algorithm" style="width:40%;"
-             onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/fig4_algorithm.png&lt;/div&gt;'">
-      </section>
-
-      <section>
-        <h3>Bias variance</h3>
-        <p>Tenemos un conjunto de datos \(D\) con \(n\) observaciones \((y_i,x_i)\sim G\). Usamos esta data para escoger una función \(\hat{f}\in F\) para predecir \(y\) con un nuevo conjunto de datos, tal que se minimice una función de pérdida, MSE (Mean Squared Error). Veamos, para un nuevo punto \(x\)</p>
-        \[ MSE(x)=E_D[(\hat{f}(x)-y)^2] \]
-        <p>Es decir, la media de la diferencia al cuadrado entre el valor predicho de \(y\), \(\hat{y}=\hat{f}(x)\) dado ese nuevo valor de \(x\) y el valor observado/realizado de \(y\)</p>
-      </section>
-
-      <section>
-        <h3>Bias variance</h3>
-        <p>Si \(y=f(x)+\epsilon\), donde \(\epsilon\sim (0,\sigma^2)\), entonces podemos hacer</p>
-        \[ MSE(x)=E_D[(\hat{f}(x)-(f(x)+\epsilon))^2] \]
-        <p>de donde se puede mostrar que</p>
-        \[ MSE(x)=E_D[(\hat{f}(x)-E_D(\hat{f}(x)))^2]+(E_D(\hat{f}(x))-f(x))^2+\sigma^2 \]
-        <p>El primer término recoge la varianza de la función de predicción. Que tanto varía esta de muestra a muestra. El segundo es el sesgo al cuadrado. El tercero es un error no reducible.</p>
-      </section>
-
-      <section>
-        <h3>Bias variance</h3>
-        <p>En la medida que el modelo sea más complejo, la varianza tiende a incrementarse, pero el sesgo a reducirse.</p>
-        <p>Si la función de predicción es MCO,</p>
-        \[ \hat{f}_{MCO}=\underset{\beta}{\mathrm{argmin}} \dfrac{1}{n}\sum_i^n (y_i-(\alpha+\beta x_i))^2 \]
-        <p>entonces el término de bias es cero, pero la varianza es alta. MCO minimiza el error de predicción dentro de muestra, pero nos interesa el desempeño fuera de muestra</p>
-      </section>
-
-      <section>
-        <h3>Bias variance</h3>
-        <p>Los algoritmos de ML se han diseñado para mejorar el desempeño predictivo teniendo en cuenta este bias variance trade-off. ML minimiza</p>
-        \[ \hat{f}_{ML}=\underset{f\in F}{\mathrm{argmin}} \dfrac{1}{n}\sum_i^n (y_i-f(x_i))^2+\lambda R(f) \]
-        <p>donde \(R(f)\) es un regularizador que penaliza las funciones que crean varianza</p>
-      </section>
-
-      <!-- ===================== REFERENCIAS ===================== -->
-      <section>
-        <h2>References</h2>
-        <p style="text-align:left; font-size:0.65em;">
-          Kleinberg, J., Ludwig, J., Mullainathan, S., &amp; Obermeyer, Z. (2015). Prediction policy problems. <em>American Economic Review, 105</em>(5), 491&ndash;495.
-        </p>
-        <p style="text-align:left; font-size:0.65em;">
-          Mullainathan, S. (2025). Economics in the age of algorithms. <em>AEA Papers and Proceedings, 115</em>, 1&ndash;23.
-        </p>
-      </section>
-
+    <!-- ===================== RESUMEN ===================== -->
+    <div class="abstract">
+      <h2>Resumen</h2>
+      <p>En esta sesión se estudian las propiedades del retorno de los activos y sus características estadísticas. Se discute su importancia para el análisis econométrico.</p>
     </div>
+
+    <article>
+
+      <!-- ===================== INTRODUCCIÓN ===================== -->
+      <section id="introduccion">
+        <h2>1. Introducción</h2>
+        <p>El análisis de series de tiempo financieras tiene que ver con la valoración de activos a lo largo del tiempo.
+          Si bien es una disciplina empírica, el análisis siempre está moldeado por la teoría. Un aspecto central del análisis de series de tiempo
+          financiera es la incertidumbre. No solamente porque no conocemos el futuro, sino también porque nuestro conocimiento es, por definición, incompleto. 
+  
+        </p>
+      </section>
+
+      <!-- ===================== SECCIÓN: RETORNOS ===================== -->
+      <section id="retornos">
+        <h2>2. Retorno de los activos</h2>
+        <p> Solemos trabajhar con el retorno y no con el precio de los activos. En primer lugar, porque el retorno es una medida sin escala y de fácil comparación entre activos.
+          Segundo, y muy importante para este curso, porque los retornos tienen propiedades estadísticas más amigables que los precios.
+          Las figuras siguientes muestran el comportamiento temporal de dos activos: bitcoin y la acción de Ecopetrol (ADS)
+        </p>
+
+        <figure>
+          <img src="images/btcplot.png" alt="Gráfico de Bitcoin" style="width:80%;"
+               onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/btcplot.png&lt;/div&gt;'">
+          <figcaption>Figura. Precio/retorno de Bitcoin.</figcaption>
+        </figure>
+
+        <figure>
+          <img src="images/ecplot.png" alt="Gráfico de la tasa de cambio" style="width:80%;"
+               onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/ecplot.png&lt;/div&gt;'">
+          <figcaption>Figura. Precio/retorno de la accción de Ecopetrol.</figcaption>
+        </figure>
+        <P>
+          El retorno a un periodo se define como 
+        </P>
+        \[1+R_t=\dfrac{P_t}{P_{t-1}}\]
+
+        <p> y el retorno neto como</p>
+        \[R_t=\dfrac{P_t}{P_{t-1}}-1\]
+        <p>El retorno multiperiodo, es decir el que se obtiene por mantener el activo durante <var>k</var> periodos es</p>
+
+        \[\prod_{j=0}^{k-1}(1+R_{t-j})\]
+
+        <p>que no es otra cosa que el retorno compuesto. Ahora, el retorno neto <var>k</var> periodos es</p>
+        \[R_t[k]=\dfrac{P_{t}}{P_{t-k}}-1\]
+        <p> y el retorno neto anualizado, CAGR, siendo <var>k</var> el número de años</p>
+
+        \[CAGR=\Big[\prod_{j=0}^{k-1}(1+R_{t-j})\Big]^{1/k}\]
+
+        <p>que no es otra cosa que</p>
+
+        \[CAGR=\Big(\dfrac{P_t}{P_{t-k}}\Big)^{1/k}-1\]
+
+        <p>También lo podemos expresar de la siguiente manera</p>
+        \[CAGR=exp\Big[k^{-1}\sum_{j=0}^{k-1}(1+R_j)\Big]-1\]
+
+        Al logaritmo natural del retorno simple lo llamamos el retorno compuesto continuo o log return
+
+        \[r_t=ln(1+R_t)=ln(P_t/P_{t-1})=p_t-p_{t-1}\]
+
+        y para mútlples periodos
+
+        \[r_t[k]=ln(1+R_t[k])=r_t+r_{t-1}+r_{t-2}+...+r_{t-k+1}\]
+
+      </section>
+
+      <!-- ===================== SECCIÓN: Propiedades estadísticas ===================== -->
+      <section id="propiedades">
+        <h2>3. Propiedades estadísticas</h2>
+        <p>Los precios y los retornos los tratamos como variables aleatorias, lo que significa que 
+          los valores que observamos en los datos son la realización de un <i>experimento</i>. Es decir, que lo que observamos
+          no es sino uno de los muchos resultados que pudimos obtener. Por eso, la variable aleatoria está caracterizada por una función de distribución
+         </p>
+        <blockquote class="definition">
+          <p>Una <strong>variable aleatoria</strong> \(X\) es una función que asigna un valor numérico a cada resultado posible de un experimento aleatorio.</p>
+          <p>La <strong>función de distribución acumulada (CDF)</strong> de \(X\) se define como</p>
+          \[ F(x) = P(X \le x) \]
+          <p>y da la probabilidad de que \(X\) tome un valor menor o igual a \(x\).</p>
+          <p>Si \(X\) es continua, la <strong>función de densidad de probabilidad (PDF)</strong> \(f(x)\) es tal que</p>
+          \[ F(x) = \int_{-\infty}^{x} f(u)\, du, \qquad f(x) = \dfrac{dF(x)}{dx} \]
+        </blockquote>
+
+        Una de las distribuciones más utilizadas es la normal
+
+        <blockquote class="definition">
+          <p>Se dice que \(X\) sigue una <strong>distribución normal</strong> con media \(\mu\) y varianza \(\sigma^2\), \(X \sim N(\mu, \sigma^2)\), si su función de densidad de probabilidad es</p>
+          \[ f(x) = \dfrac{1}{\sigma\sqrt{2\pi}} \exp\left( -\dfrac{(x-\mu)^2}{2\sigma^2} \right), \qquad x \in \mathbb{R} \]
+          <p>Cuando \(\mu = 0\) y \(\sigma^2 = 1\) se conoce como <strong>distribución normal estándar</strong>.</p>
+        </blockquote>
+
+          <figure>
+          <img src="images/normalplot.png" alt="Distribución normal" style="width:80%;"
+               onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/btcplot.png&lt;/div&gt;'">
+          <figcaption>Figura. Distribución normal.</figcaption>
+          </figure>
+          <p>Suponer que una variable aleatoria sigue una distribución normal es algo usual, sin embargo, como discutiremos más adelante, este supuesto no es siempre adecuado</p>
+      
+          <p> Una variable aleatoria puede ser descrita por sus momentos. Decimos que el momento <var>l</var>th de \(X\) es </p>
+          \[E(X^l)=\int_{-\infty}^{\infty}x^lf(x)dx\]
+
+          El primer momento, \(l=1\), es la media. Si denotamos la media como \(\mu_x\), entonces el <var>l</var>th momento central es
+
+          \[E(X-\mu_x)^l=\int_{-\infty}^{\infty}(x-\mu_x)^lf(x)dx\]
+
+          <p>El segundo momento central es la varianza, \(\sigma_x^2\), y el tercer y cuarto momento, normalizados, son la <i>skewness (asimetría)</i>
+          y la curtosis. Para una distribución normal la asimetría es 0 y la curtosis es 3. Una discusión muy importante es si las variables financieras
+          tienen o no exceso de curtosis, es decir curtosis>3. En este caso, decimos que la variable tiene colas gordas, lo que implica que los valores extremos 
+          ocurren con mayor frecuencia que en una distribución normal. Esto es fundamental para la gestión de riesgo</p>
+        </section>
+
+
+ 
+      <!-- ===================== REFERENCIAS ===================== -->
+      <section class="references" id="referencias">
+        <h2>Referencias</h2>
+        <ol>
+          <li>Tsay, R. S. (2010). <em>Analysis of financial time series, third edition</em>. Wiley.</li>
+        </ol>
+      </section>
+
+    </article>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/math/math.js"></script>
-  <script>
-    Reveal.initialize({
-      hash: true,
-      controls: true,
-      progress: true,
-      center: true,
-      width: 1280,
-      height: 720,
-      margin: 0.08,
-      minScale: 0.2,
-      maxScale: 2.0,
-      plugins: [ RevealMath.MathJax3 ]
-    });
-  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 </html>
