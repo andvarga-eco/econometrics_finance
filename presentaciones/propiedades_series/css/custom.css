@@ -1,0 +1,46 @@
+.reveal .title-slide h1 {
+  font-size: 1.6em;
+}
+.reveal .title-slide .subtitle {
+  font-size: 0.6em;
+  opacity: 0.8;
+}
+.reveal .title-slide img {
+  height: 60px;
+  margin-top: 30px;
+}
+.reveal footer.footnote,
+.reveal .footnote {
+  font-size: 0.45em;
+  opacity: 0.7;
+}
+.reveal blockquote.theorem {
+  border-left: 4px solid #2a76dd;
+  padding: 0.3em 0.8em;
+  text-align: left;
+  box-shadow: none;
+  background: rgba(42, 118, 221, 0.08);
+}
+.reveal .missing-figure {
+  border: 2px dashed #999;
+  padding: 2em;
+  font-size: 0.5em;
+  opacity: 0.7;
+}
+.reveal .slides section {
+  text-align: left;
+}
+.reveal .slides section h2,
+.reveal .slides section h3 {
+  text-align: center;
+}
+.reveal .slides section.title-slide {
+  text-align: center;
+}
+.reveal .slides section.title-slide h1,
+.reveal .slides section.title-slide p,
+.reveal .slides section.title-slide img {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}

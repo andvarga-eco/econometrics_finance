@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Introducción &mdash; Econometría</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/simple.css">
+  <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ===================== PORTADA ===================== -->
+      <section class="title-slide">
+        <h1>Introducción</h1>
+        <p>Andrés Vargas<br>
+        <small>Departamento de Economía &mdash; Universidad del Norte</small></p>
+        <img src="images/logo-uninorte.png" alt="Logo Universidad del Norte">
+      </section>
+
+      <!-- ===================== CONTENIDO ===================== -->
+      <section>
+        <h3>Predicción versus estimación</h3>
+        <p>Considere el siguiente modelo de regresión</p>
+        \[ Y=\beta_XX+\beta_W W+\epsilon \]
+        <p>Al estimar obtenemos \(\hat\beta_X\) y \(\hat\beta_W\), así como \(se(\hat\beta_X)\) y \(se(\hat\beta_W)\). Supongamos que los \(se(\cdot)\) son tales que los coeficientes no son significativos ¿Quiere decir esto que las variables \(X\) y \(W\) no sirven para predecir \(Y\)?</p>
+      </section>
+
+      <section>
+        <img src="images/fig1-3_algorithms.png" alt="fig1-3_algorithms" style="width:80%;"
+             onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/fig1-3_algorithms.png&lt;/div&gt;'">
+      </section>
+
+      <section>
+        <ul>
+          <li>Predicción: nos interesa \(\hat Y\) en relación a \(Y\)</li>
+          <li>Estimación: nos interesa \(\hat\beta\)</li>
+        </ul>
+        <p>La predicción es el dominio de ML. La estimación es el dominio de la econometría</p>
+        <ul>
+          <li>¿Cuándo un problema es de predicción y cuándo de estimación?</li>
+          <li>¿Puede el ML apoyar en problemas de estimación? Sí</li>
+        </ul>
+      </section>
+
+      <section>
+        <h3>Predicción vs causalidad</h3>
+        <p>Considere los siguientes ejemplos, (Kleinberg et al., 2015)</p>
+        <ul>
+          <li>Ante la amenaza de una sequía se debe decidir si se invierte en un baile para la lluvia a fin de aumentar la probabilidad de lluvia</li>
+          <li>Al observar nubes en el cielo debe decidir si lleva la sombrilla para no mojarse en el camino al trabajo</li>
+        </ul>
+        <p>¿Cuál es un problema de predicción y cuál de causalidad?</p>
+      </section>
+
+      <section>
+        <h3>Predicción y causalidad</h3>
+        <p>Sea \(Y\) una variable de resultado que depende de una manera desconocida de la variable \(X_0\). El tomador de decisión debe decidir sobre \(X_0\) con el propósito de maximizar una función de pago \(\pi(X_0,Y)\). La decisión depende de</p>
+        \[ \dfrac{d\pi(X_0,Y)}{dX_0}=\dfrac{\partial\pi}{\partial X_0}(Y)+\dfrac{\partial \pi}{\partial Y}\dfrac{\partial Y}{\partial X_0} \]
+        <p>El primer término requiere predicción, el segundo causalidad</p>
+      </section>
+
+      <section>
+        <h3>Predicción y causalidad</h3>
+        <ul>
+          <li>Baile para la lluvia: causalidad porque no tiene efecto directo en el pago \(\frac{\partial \pi}{\partial X_0}=0\)</li>
+          <li>Sombrilla: predicción pues estas no tienen ningún efecto sobre la lluvia \(\frac{\partial Y}{\partial X_0}=0\)</li>
+        </ul>
+        <p>En el segundo caso, el valor de la acción depende del valor de \(Y\). Requiere bajo error de predicción</p>
+      </section>
+
+      <section>
+        <p>(Mullainathan, 2025) presenta los siguientes casos</p>
+        <ul>
+          <li>En una audiencia previa el juez debe decidir si el acusado debe ser privado o no de la libertad antes del juicio. Existe el riesgo de que el acusado escape o reincida si es dejado libre ¿La decisión del juez afecta la probabilidad de escape o reincidencia?</li>
+          <li>El juez debe decidir si le coloca el brazalete electrónico al acusado ¿La decisión del juez afecta la probabilidad de escape o reincidencia?</li>
+        </ul>
+      </section>
+
+      <section>
+        <img src="images/fig4_algorithm.png" alt="fig4_algorithm" style="width:40%;"
+             onerror="this.outerHTML='&lt;div class=&quot;missing-figure&quot;&gt;Falta la imagen images/fig4_algorithm.png&lt;/div&gt;'">
+      </section>
+
+      <section>
+        <h3>Bias variance</h3>
+        <p>Tenemos un conjunto de datos \(D\) con \(n\) observaciones \((y_i,x_i)\sim G\). Usamos esta data para escoger una función \(\hat{f}\in F\) para predecir \(y\) con un nuevo conjunto de datos, tal que se minimice una función de pérdida, MSE (Mean Squared Error). Veamos, para un nuevo punto \(x\)</p>
+        \[ MSE(x)=E_D[(\hat{f}(x)-y)^2] \]
+        <p>Es decir, la media de la diferencia al cuadrado entre el valor predicho de \(y\), \(\hat{y}=\hat{f}(x)\) dado ese nuevo valor de \(x\) y el valor observado/realizado de \(y\)</p>
+      </section>
+
+      <section>
+        <h3>Bias variance</h3>
+        <p>Si \(y=f(x)+\epsilon\), donde \(\epsilon\sim (0,\sigma^2)\), entonces podemos hacer</p>
+        \[ MSE(x)=E_D[(\hat{f}(x)-(f(x)+\epsilon))^2] \]
+        <p>de donde se puede mostrar que</p>
+        \[ MSE(x)=E_D[(\hat{f}(x)-E_D(\hat{f}(x)))^2]+(E_D(\hat{f}(x))-f(x))^2+\sigma^2 \]
+        <p>El primer término recoge la varianza de la función de predicción. Que tanto varía esta de muestra a muestra. El segundo es el sesgo al cuadrado. El tercero es un error no reducible.</p>
+      </section>
+
+      <section>
+        <h3>Bias variance</h3>
+        <p>En la medida que el modelo sea más complejo, la varianza tiende a incrementarse, pero el sesgo a reducirse.</p>
+        <p>Si la función de predicción es MCO,</p>
+        \[ \hat{f}_{MCO}=\underset{\beta}{\mathrm{argmin}} \dfrac{1}{n}\sum_i^n (y_i-(\alpha+\beta x_i))^2 \]
+        <p>entonces el término de bias es cero, pero la varianza es alta. MCO minimiza el error de predicción dentro de muestra, pero nos interesa el desempeño fuera de muestra</p>
+      </section>
+
+      <section>
+        <h3>Bias variance</h3>
+        <p>Los algoritmos de ML se han diseñado para mejorar el desempeño predictivo teniendo en cuenta este bias variance trade-off. ML minimiza</p>
+        \[ \hat{f}_{ML}=\underset{f\in F}{\mathrm{argmin}} \dfrac{1}{n}\sum_i^n (y_i-f(x_i))^2+\lambda R(f) \]
+        <p>donde \(R(f)\) es un regularizador que penaliza las funciones que crean varianza</p>
+      </section>
+
+      <!-- ===================== REFERENCIAS ===================== -->
+      <section>
+        <h2>References</h2>
+        <p style="text-align:left; font-size:0.65em;">
+          Kleinberg, J., Ludwig, J., Mullainathan, S., &amp; Obermeyer, Z. (2015). Prediction policy problems. <em>American Economic Review, 105</em>(5), 491&ndash;495.
+        </p>
+        <p style="text-align:left; font-size:0.65em;">
+          Mullainathan, S. (2025). Economics in the age of algorithms. <em>AEA Papers and Proceedings, 115</em>, 1&ndash;23.
+        </p>
+      </section>
+
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/math/math.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      controls: true,
+      progress: true,
+      center: true,
+      width: 1280,
+      height: 720,
+      margin: 0.08,
+      minScale: 0.2,
+      maxScale: 2.0,
+      plugins: [ RevealMath.MathJax3 ]
+    });
+  </script>
+</body>
+</html>
