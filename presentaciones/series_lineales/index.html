@@ -222,6 +222,111 @@
         
         </P>
 
+        <h3>6.1 Propiedades de los pronósticos</h3>
+
+        <p>
+          Uno de los usos más importantes de un modelo AR es la construcción de pronósticos de los valores futuros de la serie.
+          Para fijar ideas, supongamos que conocemos el proceso generador de datos, es decir, los coeficientes \(\phi_0\) y \(\phi_1\),
+          y que en el periodo \(t\) disponemos de toda la información pasada y presente de la serie, \(X_t,X_{t-1},\dots\) y de los
+          choques \(e_t,e_{t-1},\dots\). Denotamos por \(E_t(X_{t+j})\) al pronóstico de \(X_{t+j}\) construido con la información
+          disponible en \(t\), esto es, la esperanza de \(X_{t+j}\) condicional en dicha información.
+        </p>
+
+        <p>
+          Partamos del proceso AR(1), \(X_t=\phi_0+\phi_1X_{t-1}+e_t\). Adelantando un periodo,
+
+          \[X_{t+1}=\phi_0+\phi_1X_t+e_{t+1}\]
+
+          Como \(\phi_0\) y \(\phi_1\) son conocidos y \(X_t\) pertenece al conjunto de información en \(t\), el pronóstico un
+          periodo hacia adelante es
+
+          \[E_t(X_{t+1})=\phi_0+\phi_1X_t\]
+
+          pues \(E_t(e_{t+1})=0\). De manera similar, dado que \(X_{t+2}=\phi_0+\phi_1X_{t+1}+e_{t+2}\), el pronóstico dos periodos
+          hacia adelante, condicional en la información de \(t\), es
+
+          \[E_t(X_{t+2})=\phi_0+\phi_1E_t(X_{t+1})=\phi_0(1+\phi_1)+\phi_1^2X_t\]
+
+          Este procedimiento, iterar hacia adelante usando en cada paso el pronóstico obtenido en el paso anterior, se puede repetir
+          indefinidamente. En general, el pronóstico \(j\) periodos hacia adelante, conocido como la función de pronóstico, es
+
+          \[E_t(X_{t+j})=\phi_0(1+\phi_1+\phi_1^2+\dots+\phi_1^{j-1})+\phi_1^jX_t\]
+
+          Como \(|\phi_1|\lt 1\), el segundo término se desvanece a medida que \(j\) crece, de modo que
+
+          \[\lim_{j\to\infty}E_t(X_{t+j})=\dfrac{\phi_0}{1-\phi_1}=\mu\]
+
+          Es decir, entre más lejano el horizonte de pronóstico, menos útil resulta la información disponible en \(t\), y el
+          pronóstico converge a la media incondicional del proceso. Este resultado es general: para cualquier proceso AR
+          estacionario y débilmente dependiente, el pronóstico condicional converge a la media incondicional cuando \(j\to\infty\).
+        </p>
+
+        <p>
+          Como los pronósticos no son perfectamente precisos, interesa también caracterizar el error de pronóstico. Definimos el
+          error de pronóstico \(j\) periodos hacia adelante, hecho desde \(t\), como
+
+          \[e_t(j)\equiv X_{t+j}-E_t(X_{t+j})\]
+
+          Para \(j=1\), \(e_t(1)=X_{t+1}-E_t(X_{t+1})=e_{t+1}\): el error de pronóstico un periodo hacia adelante es exactamente el
+          choque que no podíamos anticipar con la información de \(t\). Para \(j=2\),
+
+          \[e_t(2)=e_{t+2}+\phi_1e_{t+1}\]
+
+          y, en general, siguiendo la misma lógica de sustitución recursiva,
+
+          \[e_t(j)=e_{t+j}+\phi_1e_{t+j-1}+\phi_1^2e_{t+j-2}+\dots+\phi_1^{j-1}e_{t+1}\]
+
+          Como \(E_t(e_{t+i})=0\) para todo \(i\gt 0\), se sigue que \(E_t[e_t(j)]=0\): los pronósticos son insesgados, sin importar
+          el horizonte \(j\).
+        </p>
+
+        <p>
+          Aunque insesgados, los pronósticos son necesariamente imprecisos. Suponiendo que los \(e_t\) son independientes con
+          varianza \(\sigma_e^2\), la varianza del error de pronóstico se obtiene directamente de la expresión anterior
+
+          \[Var[e_t(j)]=\sigma_e^2\left(1+\phi_1^2+\phi_1^4+\dots+\phi_1^{2(j-1)}\right)\]
+
+          Así, la varianza del error un periodo hacia adelante es \(\sigma_e^2\), la varianza del error dos periodos hacia adelante
+          es \(\sigma_e^2(1+\phi_1^2)\), y así sucesivamente. Nótese que esta varianza es creciente en \(j\): tenemos más confianza
+          en los pronósticos de corto plazo que en los de largo plazo. En el límite,
+
+          \[\lim_{j\to\infty}Var[e_t(j)]=\dfrac{\sigma_e^2}{1-\phi_1^2}=\gamma_0=Var(X_t)\]
+
+          es decir, la varianza del error de pronóstico converge a la varianza incondicional del proceso.
+        </p>
+
+        <p>
+          Suponiendo adicionalmente que \(\{e_t\}\) sigue una distribución normal, es posible construir intervalos de confianza
+          alrededor de los pronósticos. El intervalo de confianza al 95% para el pronóstico un periodo hacia adelante es
+
+          \[\phi_0+\phi_1X_t\pm 1.96\,\sigma_e\]
+
+          y el intervalo de confianza al 95% para el pronóstico dos periodos hacia adelante es
+
+          \[\phi_0(1+\phi_1)+\phi_1^2X_t\pm 1.96\,\sigma_e\sqrt{1+\phi_1^2}\]
+
+          Nótese que el intervalo se ensancha con el horizonte de pronóstico, reflejando la mayor incertidumbre de los pronósticos
+          de largo plazo.
+        </p>
+
+        <p>
+          El mismo procedimiento de iteración hacia adelante se extiende, sin dificultad conceptual, a procesos AR de orden superior.
+          Considere, por ejemplo, un AR(2), \(r_t=\phi_0+\phi_1r_{t-1}+\phi_2r_{t-2}+e_t\). Adelantando un periodo, el pronóstico un
+          paso hacia adelante es
+
+          \[E_t(r_{t+1})=\phi_0+\phi_1r_t+\phi_2r_{t-1}\]
+
+          y, dado que \(r_{t+2}=\phi_0+\phi_1r_{t+1}+\phi_2r_t+e_{t+2}\), el pronóstico dos pasos hacia adelante es
+
+          \[E_t(r_{t+2})=\phi_0+\phi_1E_t(r_{t+1})+\phi_2r_t=\phi_0(1+\phi_1)+(\phi_1^2+\phi_2)r_t+\phi_1\phi_2r_{t-1}\]
+
+          De esta manera, sustituyendo hacia adelante paso a paso, se puede construir la función de pronóstico para cualquier
+          horizonte \(j\) y cualquier orden \(p\). Las propiedades generales que encontramos para el AR(1) &mdash;convergencia del
+          pronóstico a la media incondicional, insesgamiento del error de pronóstico y varianza del error creciente en el horizonte,
+          convergiendo a la varianza incondicional&mdash; se preservan para cualquier proceso AR(p) estacionario y débilmente
+          dependiente.
+        </p>
+
       </section>
       <!-- ===================== REFERENCIAS ===================== -->
       <section class="references" id="referencias">
