@@ -184,7 +184,7 @@
 
           Si resolvemos de manera recursiva, podemos mostrar que
 
-          \[X_t=\phi_0(1+\phi_1+\phi_1^2+\phi_3^3+...+\phi^{t-1})+\phi_1^tX_0+\sum_i=0^t\phi_1^{t}e_{t-i}\]
+          \[X_t=\phi_0(1+\phi_1+\phi_1^2+\phi_1^3+...+\phi_1^{t-1})+\phi_1^tX_0+\sum_{i=0}^t\phi_1^{t}e_{t-i}\]
 
           Si \(|\phi_1 \lt 1|\) el proceso es
 
@@ -328,11 +328,368 @@
         </p>
 
       </section>
+
+      <!-- ===================== SECCIÓN: Modelos MA(q) ===================== -->
+      <section id="Modelos MA(q)">
+        <h2>7. Modelos MA(q)</h2>
+
+        <p>
+          Un modelo de promedio móvil, MA de orden q, MA(q), se representa como
+
+          \[r_t=\mu+e_t+\theta_1e_{t-1}+\theta_2e_{t-2}+...+\theta_qe_{t-q}\]
+
+          donde \(e_t\) es un ruido blanco y \(\mu\) es la media incondicional del proceso. A diferencia de un modelo AR, en el
+          que el valor presente depende de sus propios rezagos, en un modelo MA el valor presente se construye como una
+          combinación lineal finita de choques aleatorios, pasados y presentes. Como se trata de una suma finita de términos
+          de un proceso de ruido blanco, un modelo MA(q) es <em>siempre</em> estacionario, sin importar el valor de los
+          coeficientes \(\theta_i\); no existe, por tanto, una restricción de estacionariedad análoga a la que vimos para los
+          modelos AR. Sin embargo, como veremos, existe una restricción distinta &mdash;la invertibilidad&mdash; que cumple,
+          para los modelos MA, un papel similar al que cumple la estacionariedad en los modelos AR. Estudiemos en detalle el
+          proceso MA(1) para apreciar las ideas importantes
+        </p>
+
+        <p>
+          Supongamos una serie de tiempo \(\{X_t\}\). Decimos que la variable aleatoria \(X_t\) sigue un proceso MA(1) si
+
+          \[X_t=\mu+e_t+\theta_1e_{t-1}\]
+
+          Tomando esperanza, y dado que \(E(e_t)=E(e_{t-1})=0\),
+
+          \[E(X_t)=\mu\]
+
+          para todo \(t\): la media es finita y constante, sin ninguna restricción sobre \(\theta_1\). Para la varianza,
+
+          \[Var(X_t)=E[(e_t+\theta_1e_{t-1})^2]=E(e_t^2)+\theta_1^2E(e_{t-1}^2)=\sigma_e^2(1+\theta_1^2)\]
+
+          que también es finita y constante para todo \(t\). Para la autocovarianza de orden 1,
+
+          \[\gamma_1=E[(e_t+\theta_1e_{t-1})(e_{t-1}+\theta_1e_{t-2})]=\theta_1\sigma_e^2\]
+
+          mientras que, para cualquier rezago \(s\gt1\), no hay choques compartidos entre \(X_t\) y \(X_{t-s}\), de modo que
+
+          \[\gamma_s=0 \qquad \text{para } s\gt1\]
+
+          Dividiendo por \(\gamma_0=Var(X_t)\), la función de autocorrelación de un proceso MA(1) es
+
+          \[\rho_1=\dfrac{\theta_1}{1+\theta_1^2} \qquad\qquad \rho_s=0 \quad\text{para } s\gt1\]
+
+          Esta es una diferencia esencial frente al proceso AR(1): mientras que la ACF de un AR(1) decae geométricamente hacia
+          cero sin anularse nunca por completo, la ACF de un MA(1) presenta un <em>corte abrupto</em> después del primer
+          rezago. En general, la ACF de un proceso MA(q) se anula por completo después del rezago q, lo cual es una
+          herramienta muy útil para identificar el orden de un modelo MA a partir de los datos.
+        </p>
+
+        <p>
+          Aunque un MA(1) es estacionario para cualquier valor de \(\theta_1\), existe un problema de identificación: dos
+          procesos MA(1) con parámetros \(\theta_1\) y \(1/\theta_1\) generan exactamente la misma ACF (\(\rho_1\) no cambia
+          si se reemplaza \(\theta_1\) por su recíproco), de modo que no es posible distinguirlos a partir de las
+          autocorrelaciones. La convención usual es restringir la atención a la representación <strong>invertible</strong>,
+          es decir, aquella para la cual \(|\theta_1|\lt1\). Bajo esta condición, es posible expresar el choque \(e_t\) como
+          una combinación convergente de los valores presentes y pasados de \(X_t\), es decir, como un proceso
+          \(AR(\infty)\)
+
+          \[e_t=X_t-\theta_1X_{t-1}+\theta_1^2X_{t-2}-\theta_1^3X_{t-3}+\cdots\]
+
+          La invertibilidad cumple, entonces, un papel análogo al de la estacionariedad en un modelo AR: así como la
+          estacionariedad garantiza una representación \(MA(\infty)\) convergente para un AR, la invertibilidad garantiza
+          una representación \(AR(\infty)\) convergente para un MA, y asegura además que el choque más reciente reciba el
+          mayor peso en la reconstrucción de \(e_t\), lo que resulta indispensable para el pronóstico.
+        </p>
+
+        <h3>7.1 Propiedades de los pronósticos</h3>
+
+        <p>
+          Construyamos la función de pronóstico para el proceso MA(1), \(X_t=\mu+e_t+\theta_1e_{t-1}\). Adelantando un
+          periodo,
+
+          \[X_{t+1}=\mu+e_{t+1}+\theta_1e_t\]
+
+          Como \(e_t\) pertenece al conjunto de información disponible en \(t\) (es un choque ya realizado) mientras que
+          \(e_{t+1}\) todavía no se ha observado, el pronóstico un periodo hacia adelante es
+
+          \[E_t(X_{t+1})=\mu+\theta_1e_t\]
+
+          pues \(E_t(e_{t+1})=0\). Ahora, adelantando dos periodos,
+
+          \[X_{t+2}=\mu+e_{t+2}+\theta_1e_{t+1}\]
+
+          y, dado que tanto \(e_{t+1}\) como \(e_{t+2}\) son desconocidos en \(t\), el pronóstico dos periodos hacia adelante
+          es simplemente
+
+          \[E_t(X_{t+2})=\mu\]
+
+          Es decir, a diferencia del proceso AR(1), en el que el pronóstico converge <em>gradualmente</em> a la media
+          incondicional a medida que el horizonte crece, en un MA(1) el pronóstico alcanza la media incondicional de manera
+          <em>inmediata</em> a partir del segundo periodo. Este resultado se generaliza: para un proceso MA(q), el mejor
+          pronóstico coincide con la media incondicional \(\mu\) para cualquier horizonte \(j\gt q\), pues ningún choque
+          futuro relevante para ese horizonte ha sido observado todavía en \(t\).
+        </p>
+
+        <p>
+          El error de pronóstico un periodo hacia adelante es \(e_t(1)=X_{t+1}-E_t(X_{t+1})=e_{t+1}\), con varianza
+          \(\sigma_e^2\), idéntico al caso AR(1). El error dos periodos hacia adelante es
+
+          \[e_t(2)=X_{t+2}-E_t(X_{t+2})=e_{t+2}+\theta_1e_{t+1}\]
+
+          con varianza
+
+          \[Var[e_t(2)]=\sigma_e^2(1+\theta_1^2)=\gamma_0=Var(X_t)\]
+
+          Nótese que esta varianza es exactamente la varianza incondicional del proceso. Así, mientras que en un AR(1) la
+          varianza del error de pronóstico converge <em>asintóticamente</em> a la varianza incondicional cuando
+          \(j\to\infty\), en un MA(1) dicha convergencia ocurre de manera <em>exacta</em> a partir de \(j=2\): más allá del
+          orden \(q\) del proceso, no hay nada más que el modelo pueda decirnos sobre el futuro que no esté ya contenido en
+          su media y su varianza incondicionales.
+        </p>
+      </section>
+
+      <!-- ===================== SECCIÓN: Modelo ARMA(p,q) ===================== -->
+      <section id="Modelo ARMA(p,q)">
+        <h2>8. Modelo ARMA(p,q)</h2>
+
+        <p>
+          Combinando la estructura autorregresiva de la Sección 6 con la estructura de promedio móvil de la Sección 7 se
+          obtiene el modelo autorregresivo de promedio móvil, ARMA de órdenes p y q, ARMA(p,q):
+
+          \[r_t=\phi_0+\phi_1r_{t-1}+\phi_2r_{t-2}+...+\phi_pr_{t-p}+e_t+\theta_1e_{t-1}+\theta_2e_{t-2}+...+\theta_qe_{t-q}\]
+
+          La parte autorregresiva impone la restricción de estacionariedad estudiada en la Sección 6 (las raíces
+          características del polinomio autorregresivo deben estar fuera del círculo unitario); la parte de promedio móvil
+          impone la restricción de invertibilidad estudiada en la Sección 7 (las raíces del polinomio de promedio móvil
+          deben estar fuera del círculo unitario). Ambas restricciones son independientes entre sí y deben cumplirse
+          simultáneamente. Estudiemos en detalle el proceso ARMA(1,1) para apreciar las ideas importantes
+        </p>
+
+        <p>
+          Supongamos una serie de tiempo \(\{X_t\}\). Decimos que la variable aleatoria \(X_t\) sigue un proceso ARMA(1,1)
+          si
+
+          \[X_t=\phi_0+\phi_1X_{t-1}+e_t+\theta_1e_{t-1}\]
+
+          Como en el caso AR(1), la condición de estacionariedad es \(|\phi_1|\lt1\); la condición de invertibilidad,
+          heredada de la parte MA, es \(|\theta_1|\lt1\). Bajo estacionariedad, y siguiendo el mismo procedimiento de
+          sustitución recursiva usado en la Sección 6, la media incondicional es
+
+          \[E(X_t)=\dfrac{\phi_0}{1-\phi_1}=\mu\]
+
+          pues, al igual que en el caso puramente MA, los términos \(e_t\) y \(e_{t-1}\) tienen esperanza incondicional
+          igual a cero y no alteran la media.
+        </p>
+
+        <p>
+          Para encontrar la varianza y las autocovarianzas usamos, como en la Sección 6, las ecuaciones de
+          Yule&ndash;Walker. Multiplicando la ecuación (sin el intercepto, que no afecta la ACF) por \(X_t\) y por
+          \(X_{t-1}\), y tomando esperanzas, se obtiene el sistema
+
+          \[\gamma_0=\phi_1\gamma_1+\sigma_e^2+\theta_1(\phi_1+\theta_1)\sigma_e^2\]
+          \[\gamma_1=\phi_1\gamma_0+\theta_1\sigma_e^2\]
+
+          Resolviendo simultáneamente para \(\gamma_0\) y \(\gamma_1\),
+
+          \[\gamma_0=\dfrac{(1+\theta_1^2+2\phi_1\theta_1)}{1-\phi_1^2}\sigma_e^2 \qquad\qquad
+          \gamma_1=\dfrac{(1+\phi_1\theta_1)(\phi_1+\theta_1)}{1-\phi_1^2}\sigma_e^2\]
+
+          y, para \(s\geq2\), no hay términos de promedio móvil que conecten \(X_t\) con \(X_{t-s}\), de modo que la
+          autocovarianza satisface la misma ecuación homogénea que en un AR(1) puro: \(\gamma_s=\phi_1\gamma_{s-1}\).
+          Dividiendo por \(\gamma_0\), la función de autocorrelación del ARMA(1,1) es
+
+          \[\rho_1=\dfrac{(1+\phi_1\theta_1)(\phi_1+\theta_1)}{1+\theta_1^2+2\phi_1\theta_1} \qquad\qquad
+          \rho_s=\phi_1\rho_{s-1} \quad\text{para } s\geq2\]
+
+          Es decir, el término de promedio móvil determina, junto con \(\phi_1\), el valor inicial \(\rho_1\), pero a partir
+          de ese punto la ACF decae geométricamente a la tasa \(\phi_1\), exactamente como la de un AR(1). Este es el patrón
+          general de cualquier ARMA(p,q): la ACF comienza a decaer, siguiendo la dinámica autorregresiva, solo después del
+          rezago q.
+        </p>
+
+        <h3>8.1 Propiedades de los pronósticos</h3>
+
+        <p>
+          Para construir la función de pronóstico del ARMA(1,1), \(X_t=\phi_0+\phi_1X_{t-1}+e_t+\theta_1e_{t-1}\),
+          adelantamos un periodo
+
+          \[X_{t+1}=\phi_0+\phi_1X_t+e_{t+1}+\theta_1e_t\]
+
+          Como \(X_t\) y \(e_t\) pertenecen al conjunto de información en \(t\), mientras que \(e_{t+1}\) no, el pronóstico
+          un periodo hacia adelante es
+
+          \[E_t(X_{t+1})=\phi_0+\phi_1X_t+\theta_1e_t\]
+
+          Nótese que, a diferencia del AR(1) puro, el pronóstico incorpora directamente el último choque observado,
+          \(e_t\), a través del término \(\theta_1e_t\). Adelantando un periodo más,
+
+          \[X_{t+2}=\phi_0+\phi_1X_{t+1}+e_{t+2}+\theta_1e_{t+1}\]
+
+          y, como ni \(e_{t+1}\) ni \(e_{t+2}\) pertenecen al conjunto de información en \(t\), el término de promedio móvil
+          desaparece del pronóstico
+
+          \[E_t(X_{t+2})=\phi_0+\phi_1E_t(X_{t+1})\]
+
+          A partir de este punto, el procedimiento de iteración hacia adelante es idéntico al de un AR(1) puro: el
+          pronóstico \(j\) periodos hacia adelante, para \(j\geq2\), satisface la misma recursión
+          \(E_t(X_{t+j})=\phi_0+\phi_1E_t(X_{t+j-1})\) encontrada en la Sección 6.1, y converge a la media incondicional
+          cuando \(j\to\infty\)
+
+          \[\lim_{j\to\infty}E_t(X_{t+j})=\dfrac{\phi_0}{1-\phi_1}=\mu\]
+
+          El error de pronóstico un periodo hacia adelante es, de nuevo, \(e_t(1)=e_{t+1}\), con varianza \(\sigma_e^2\). El
+          error dos periodos hacia adelante recoge, adicionalmente, el efecto del término de promedio móvil
+
+          \[e_t(2)=e_{t+2}+(\phi_1+\theta_1)e_{t+1} \qquad\Rightarrow\qquad Var[e_t(2)]=\sigma_e^2[1+(\phi_1+\theta_1)^2]\]
+
+          valor que, en general, difiere del correspondiente a un AR(1) puro. Para horizontes \(j\geq3\), el error de
+          pronóstico vuelve a satisfacer la recursión propia de un AR(1), \(e_t(j)=\phi_1e_t(j-1)+e_{t+j}\), de modo que su
+          varianza también converge, como en la Sección 6.1, a la varianza incondicional \(\gamma_0\) del proceso cuando
+          \(j\to\infty\). En síntesis, el componente de promedio móvil de un ARMA(1,1) afecta únicamente al pronóstico y a
+          su varianza en los primeros periodos; a partir de ahí, es la parte autorregresiva la que gobierna por completo la
+          dinámica de largo plazo.
+        </p>
+      </section>
+
+      <!-- ===================== SECCIÓN: Caminata aleatoria y raíz unitaria ===================== -->
+      <section id="Caminata aleatoria y raiz unitaria">
+        <h2>9. Caminata aleatoria y prueba de raíz unitaria</h2>
+
+        <p>
+          En la Sección 6 vimos que, cuando \(\phi_1=1\) en un proceso AR(1), el requisito de estacionariedad deja de
+          cumplirse y obtenemos, según el valor de \(\phi_0\), una caminata aleatoria sin deriva o una caminata aleatoria
+          con deriva. Estos dos procesos son de enorme importancia práctica &mdash;muchas series financieras, como los
+          precios de los activos, se comportan de esta manera&mdash; y merecen un tratamiento detallado. Cerramos la
+          sección presentando una prueba formal, la prueba de Dickey&ndash;Fuller, para determinar si una serie observada
+          es de este tipo.
+        </p>
+
+        <h3>9.1 Caminata aleatoria sin deriva</h3>
+
+        <p>
+          Decimos que \(\{X_t\}\) sigue una caminata aleatoria si
+
+          \[X_t=X_{t-1}+e_t\]
+
+          es decir, un AR(1) con \(\phi_0=0\) y \(\phi_1=1\). Dada la condición inicial \(X_0\), resolviendo
+          recursivamente se obtiene
+
+          \[X_t=X_0+\sum_{i=1}^te_i\]
+
+          Tomando esperanza, \(E(X_t)=X_0\) para todo \(t\): la media es constante. Sin embargo, la varianza es
+
+          \[Var(X_t)=Var\left(\sum_{i=1}^te_i\right)=t\,\sigma_e^2\]
+
+          que crece indefinidamente con \(t\); la caminata aleatoria es, por tanto, no estacionaria. De manera similar, la
+          covarianza entre \(X_t\) y \(X_{t-s}\) es \((t-s)\sigma_e^2\), de donde el coeficiente de correlación es
+
+          \[\rho_s=\sqrt{\dfrac{t-s}{t}}\]
+
+          Para \(s\) pequeño en relación con \(t\), este coeficiente es cercano a 1 y decae muy lentamente a medida que
+          \(s\) aumenta. Esto tiene una implicación práctica importante: la ACF muestral de una caminata aleatoria decae de
+          forma tan lenta que puede confundirse fácilmente con la de un proceso AR(1) estacionario, pero con una raíz
+          característica muy cercana (aunque no igual) a la unidad. Por esta razón, la sola inspección visual del
+          correlograma no basta para distinguir entre ambas situaciones, lo que motiva la prueba formal presentada en la
+          Sección 9.3.
+        </p>
+
+        <p>
+          Finalmente, el pronóstico óptimo \(j\) periodos hacia adelante es simplemente el último valor observado
+
+          \[E_t(X_{t+j})=X_t \qquad \text{para todo } j\gt0\]
+
+          Es decir, la función de pronóstico es plana: no hay ninguna tendencia a revertir hacia un valor de largo plazo.
+          Esta es la diferencia esencial frente a un proceso estacionario como el AR(1) estudiado en la Sección 6: allí,
+          cada choque \(e_t\) tenía un efecto temporal, que se diluía con el tiempo; aquí, cada choque tiene un efecto
+          permanente sobre el nivel de la serie, pues nunca se descuenta en las realizaciones futuras.
+        </p>
+
+        <h3>9.2 Caminata aleatoria con deriva</h3>
+
+        <p>
+          Si además \(\phi_0\neq0\), obtenemos la caminata aleatoria con deriva
+
+          \[X_t=\phi_0+X_{t-1}+e_t\]
+
+          cuya solución, dada la condición inicial \(X_0\), es
+
+          \[X_t=X_0+\phi_0t+\sum_{i=1}^te_i\]
+
+          A diferencia del caso anterior, ahora la media es una función lineal (determinística) del tiempo,
+          \(E(X_t)=X_0+\phi_0t\), mientras que la varianza conserva la misma forma que antes, \(Var(X_t)=t\,\sigma_e^2\). El
+          proceso combina, entonces, una tendencia determinística (\(\phi_0t\)) con una tendencia estocástica
+          (\(\sum e_i\)); ambos componentes son no estacionarios, pero de naturaleza distinta: mientras que la tendencia
+          determinística es perfectamente predecible, la tendencia estocástica acumula, de manera permanente, el efecto de
+          cada choque aleatorio pasado.
+        </p>
+
+        <p>
+          El pronóstico \(j\) periodos hacia adelante ya no es plano, sino que refleja la deriva
+
+          \[E_t(X_{t+j})=X_t+\phi_0j\]
+
+          Nótese que, si se toma la primera diferencia de la serie, \(\Delta X_t=\phi_0+e_t\), se obtiene un proceso
+          estacionario (de hecho, un ruido blanco con media \(\phi_0\)). Esta observación es la base del procedimiento de
+          diferenciación como método para convertir una serie con raíz unitaria en una serie estacionaria, tema que
+          retomaremos más adelante.
+        </p>
+
+        <h3>9.3 La prueba de Dickey&ndash;Fuller</h3>
+
+        <p>
+          Dado que, como vimos en la Sección 9.1, el correlograma no permite distinguir con claridad entre una caminata
+          aleatoria y un proceso estacionario con una raíz característica cercana a la unidad, se requiere una prueba de
+          hipótesis formal. Dickey y Fuller (1979) propusieron una prueba basada en una simple reparametrización del
+          modelo AR(1). Partiendo de
+
+          \[X_t=\phi_1X_{t-1}+e_t\]
+
+          y restando \(X_{t-1}\) a ambos lados, se obtiene la forma equivalente
+
+          \[\Delta X_t=\gamma X_{t-1}+e_t \qquad\qquad \gamma\equiv\phi_1-1\]
+
+          De modo que contrastar la hipótesis de raíz unitaria, \(H_0:\phi_1=1\), es exactamente equivalente a contrastar
+          \(H_0:\gamma=0\) contra la alternativa de estacionariedad, \(H_1:\gamma\lt0\). Según los componentes
+          determinísticos que se incluyan, se estima una de tres regresiones:
+
+          \[\Delta X_t=\gamma X_{t-1}+e_t \qquad\text{(sin constante)}\]
+          \[\Delta X_t=\alpha+\gamma X_{t-1}+e_t \qquad\text{(con constante)}\]
+          \[\Delta X_t=\alpha+\gamma X_{t-1}+\beta t+e_t \qquad\text{(con constante y tendencia)}\]
+
+          En los tres casos, la hipótesis de interés se contrasta con el estadístico \(t\) usual para \(\hat\gamma\),
+          \(t=\hat\gamma/ee(\hat\gamma)\). Sin embargo, bajo \(H_0\) la serie \(X_{t-1}\) es no estacionaria, de modo que
+          este estadístico <em>no</em> sigue una distribución t de Student ni normal estándar, ni siquiera
+          asintóticamente. Dickey y Fuller derivaron, mediante simulación, la distribución correcta bajo la hipótesis nula
+          y tabularon sus valores críticos (denotados \(\tau\), \(\tau_\mu\) y \(\tau_\tau\) para las tres regresiones
+          anteriores, respectivamente). Estos valores críticos son sistemáticamente más negativos que los de una
+          distribución normal estándar: por ejemplo, con constante y muestras moderadamente grandes, el valor crítico al
+          5% es de aproximadamente \(-2.86\), en lugar del familiar \(-1.96\). Esto refleja el hecho de que, bajo la
+          hipótesis nula, es relativamente más fácil obtener, por azar, un coeficiente \(\hat\gamma\) negativo y
+          significativo según los criterios convencionales.
+        </p>
+
+        <p>
+          La regla de decisión es la usual: si el estadístico calculado es menor (más negativo) que el valor crítico
+          tabulado, se rechaza \(H_0\) y se concluye que la serie es estacionaria; en caso contrario, no se rechaza la
+          hipótesis de raíz unitaria, y se recomienda trabajar con la serie diferenciada, \(\Delta X_t\), en lugar de con
+          su nivel.
+        </p>
+
+        <p>
+          Cuando el término de error \(e_t\) del modelo original está autocorrelacionado &mdash;por ejemplo, si el
+          verdadero proceso generador de datos es un AR(p) o incluye componentes de promedio móvil&mdash;, las regresiones
+          anteriores deben ampliarse incluyendo rezagos de la variable diferenciada como regresores adicionales
+
+          \[\Delta X_t=\alpha+\gamma X_{t-1}+\sum_{i=2}^p\beta_i\Delta X_{t-i+1}+e_t\]
+
+          Esta versión se conoce como la prueba <strong>aumentada</strong> de Dickey&ndash;Fuller (ADF), y es la que se usa
+          en la práctica: los rezagos adicionales de \(\Delta X_t\) capturan la dinámica de corto plazo y garantizan que el
+          término de error resultante sea aproximadamente ruido blanco, sin alterar la distribución asintótica del
+          estadístico \(\gamma\), que sigue las mismas tablas \(\tau\), \(\tau_\mu\) y \(\tau_\tau\) de la prueba simple.
+        </p>
+      </section>
+
       <!-- ===================== REFERENCIAS ===================== -->
       <section class="references" id="referencias">
         <h2>Referencias</h2>
         <ol>
           <li>Tsay, R. S. (2010). <em>Analysis of financial time series, third edition</em>. Wiley.</li>
+          <li>Enders, W. (2015). <em>Applied econometric time series, fourth edition</em>. Wiley.</li>
         </ol>
       </section>
 
