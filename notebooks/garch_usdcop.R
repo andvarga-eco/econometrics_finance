@@ -1,21 +1,3 @@
-#############################################################################
-# ESTIMACIÓN DE UN MODELO GARCH PARA EL PRECIO DEL PETRÓLEO BRENT
-# Datos diarios, últimos 5 años, descargados directamente de Yahoo Finance
-#
-# Flujo de trabajo:
-#   1. Paquetes y descarga de datos
-#   2. Construcción de retornos y análisis exploratorio
-#   3. Pruebas de efectos ARCH (justificación del modelo GARCH)
-#   4. Especificación y estimación del modelo GARCH(1,1)
-#   5. Diagnóstico del modelo (residuales estandarizados)
-#   6. Pronóstico de volatilidad
-#   7. (Opcional) Modelos asimétricos GJR-GARCH / EGARCH y comparación
-#############################################################################
-
-# ---------------------------------------------------------------------------
-# 1. PAQUETES
-# ---------------------------------------------------------------------------
-
 paquetes <- c("quantmod", "rugarch", "tseries", "FinTS")
 faltantes <- paquetes[!(paquetes %in% installed.packages()[, "Package"])]
 if (length(faltantes) > 0) install.packages(faltantes)
@@ -27,11 +9,11 @@ invisible(lapply(paquetes, library, character.only = TRUE))
 # ---------------------------------------------------------------------------
 # Ticker del petróleo Brent (ICE Brent Crude Oil futures) en Yahoo Finance: "BZ=F"
 
-ticker    <- "BZ=F"
+ticker    <- "usdcop=x"
 fecha_fin <- Sys.Date()
 fecha_ini <- fecha_fin - 5 * 365  # aprox. 5 años de historia
 
-brent <- getSymbols(
+usdcop<- getSymbols(
   Symbols     = ticker,
   src         = "yahoo",
   from        = fecha_ini,
@@ -40,10 +22,10 @@ brent <- getSymbols(
 )
 
 # Nos quedamos con el precio de cierre y eliminamos NAs (días sin cotización)
-precio <- na.omit(Cl(brent))
+precio <- na.omit(Cl(usdcop))
 colnames(precio) <- "Cierre"
 
-plot(precio, main = "Precio de cierre - Petróleo Brent (BZ=F)", col = "steelblue")
+plot(precio, main = "Precio de cierre - USDCOP", col = "steelblue")
 
 # ---------------------------------------------------------------------------
 # 3. RETORNOS Y ANÁLISIS EXPLORATORIO
@@ -53,7 +35,7 @@ plot(precio, main = "Precio de cierre - Petróleo Brent (BZ=F)", col = "steelblu
 retornos <- na.omit(diff(log(precio)) * 100)
 colnames(retornos) <- "retorno"
 
-plot(retornos, main = "Retornos diarios - Brent", col = "darkred")
+plot(retornos, main = "Retornos diarios - USDCOP", col = "darkred")
 hist(retornos, breaks = 60, main = "Distribución de los retornos", col = "gray80",
      xlab = "Retorno (%)")
 
@@ -77,6 +59,16 @@ pacf(retornos,     main = "PACF retornos")
 acf(retornos^2,    main = "ACF retornos^2")
 pacf(retornos^2,   main = "PACF retornos^2")
 par(mfrow = c(1, 1))
+
+# Aparente efecto día de la semana. Dummies por día
+
+wday_num<-.indexwday(retornos)
+
+days_matrix <- model.matrix(~ factor(wday_num) - 1)
+# Name the columns appropriately
+colnames(days_matrix) <- c("Sun", "Mon", "Tue", "Wed", "Thu", "Fri")[unique(wday_num) + 1]
+
+days_matrix<-days_matrix[,-4]
 
 # ---------------------------------------------------------------------------
 # 4. PRUEBAS DE EFECTOS ARCH (justifican el uso de un modelo GARCH)
@@ -157,31 +149,45 @@ pronostico
 plot(pronostico, which = 1)  # pronóstico de la serie (retornos)
 plot(pronostico, which = 3)  # pronóstico de la volatilidad (sigma) condicional
 
-# ---------------------------------------------------------------------------
-# 8. (OPCIONAL) MODELOS ASIMÉTRICOS Y COMPARACIÓN
-# ---------------------------------------------------------------------------
-# El precio del petróleo suele mostrar asimetría en la volatilidad (choques
-# negativos de precio elevan la volatilidad más que choques positivos).
-# Si la prueba de sesgo de signo (paso 6.5) resulta significativa, conviene
-# comparar el GARCH simétrico con especificaciones asimétricas.
+# Las pruebas de residuales sugieren que aún hay correlación de orden 5 en la ecuación de la media
+# Incorporamos regresores externos
 
-spec_gjr <- ugarchspec(
-  variance.model = list(model = "gjrGARCH", garchOrder = c(1, 1)),
-  mean.model     = list(armaOrder = c(0, 0), include.mean = TRUE),
+spec_garch_dow <- ugarchspec(
+  variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),
+  mean.model     = list(armaOrder = c(0, 0), include.mean = TRUE, external.regressors=days_matrix),
   distribution.model = "std"
 )
-fit_gjr <- ugarchfit(spec = spec_gjr, data = retornos, solver = "hybrid")
 
-spec_egarch <- ugarchspec(
-  variance.model = list(model = "eGARCH", garchOrder = c(1, 1)),
-  mean.model     = list(armaOrder = c(0, 0), include.mean = TRUE),
-  distribution.model = "std"
-)
-fit_egarch <- ugarchfit(spec = spec_egarch, data = retornos, solver = "hybrid")
+fit_garch_dow <- ugarchfit(spec = spec_garch_dow, data = retornos, solver = "hybrid")
 
-comparacion <- data.frame(
-  modelo = c("sGARCH(1,1)", "gjrGARCH(1,1)", "eGARCH(1,1)"),
-  AIC = c(infocriteria(fit_garch)[1], infocriteria(fit_gjr)[1], infocriteria(fit_egarch)[1]),
-  BIC = c(infocriteria(fit_garch)[2], infocriteria(fit_gjr)[2], infocriteria(fit_egarch)[2])
-)
-comparacion  # el modelo con menor AIC/BIC es preferible
+show(fit_garch_dow)          # resumen completo: coeficientes, criterios de info, pruebas
+coef(fit_garch_dow)          # coeficientes estimados
+infocriteria(fit_garch_dow)  # AIC, BIC, etc.
+
+coef(fit_garch_dow)["alpha1"]+coef(fit_garch_dow)["beta1"]
+coef(fit_garch_dow)["omega"]/(1-(coef(fit_garch_dow)["alpha1"]+coef(fit_garch_dow)["beta1"]))
+
+res_std_dow <- residuals(fit_garch_dow, standardize = TRUE)
+
+Box.test(res_std_dow,    lag = 10, type = "Ljung-Box")
+Box.test(res_std_dow^2,  lag = 10, type = "Ljung-Box")
+FinTS::ArchTest(res_std_dow, lags = 10)
+
+jarque.bera.test(as.numeric(res_std_dow))
+qqnorm(as.numeric(res_std_dow), main = "QQ-plot de residuales estandarizados")
+qqline(as.numeric(res_std_dow), col = "red")
+
+signbias(fit_garch_dow)
+nyblom(fit_garch_dow)
+
+plot(fit_garch_dow, which = "all")
+
+vol_dow<-sigma(fit_garch_dow)
+plot(vol_dow)
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+tail(sigma(fit_garch_dow))
+pronostico_dow <- ugarchforecast(fit_garch_dow, n.ahead = 30)
+pronostico_dow
+plot(pronostico_dow, which = 1)  # pronóstico de la serie (retornos)
+plot(pronostico_dow, which = 3)  # pronóstico de la volatilidad (sigma) condicional
