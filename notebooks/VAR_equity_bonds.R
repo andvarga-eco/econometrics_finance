@@ -41,27 +41,26 @@ colnames(equity_px) <- "px_equity"
 #
 # Se espera un CSV con columnas: fecha (YYYY-MM-DD), tasa (o precio) del TES
 
-ruta_tes <- "tes_banrep.csv"   # <-- ajustar ruta al archivo descargado
+ruta_tes <- "https://raw.githubusercontent.com/andvarga-eco/econometrics_finance/refs/heads/main/notebooks/1_Tasa_cero_cupon_iqy.csv"   # <-- ajustar ruta al archivo descargado
 
 tes_raw <- read_csv(ruta_tes, locale = locale(decimal_mark = ","))
 # Ajusta nombres de columnas según el CSV real de SUAMECA:
-tes_raw <- tes_raw %>%
-  rename(fecha = 1, tasa_tes = 2) %>%
-  mutate(fecha = as.Date(fecha)) %>%
-  arrange(fecha)
+names(tes_raw)[5]<-"fecha"
+tes_raw <- tes_raw|>arrange(fecha)|>filter(Denominación=="Pesos colombianos" & Plazo=="Cinco años")
+tes_raw<-tes_raw|>select(c(fecha,'Tasa (%)'))
+tes_raw<-tes_raw|>filter(fecha>'2020-01-01')
 
-# Si descargaste TASA (no precio), aproximamos el rendimiento de precio
-# usando duración modificada: ret_bond_t ≈ -Duracion * (tasa_t - tasa_{t-1})
-duracion_modificada <- 7.5   # ajustar según el plazo del TES usado
 
-tes_raw <- tes_raw %>%
-  mutate(ret_bond = -duracion_modificada * (tasa_tes - lag(tasa_tes)))
+# Conversión de la tasa cero cupón a precio
 
-# --- 1c. (Opcional) TRM como tercera variable --------------------------------
-# ruta_trm <- "trm_banrep.csv"
-# trm_raw <- read_csv(ruta_trm) %>%
-#   rename(fecha = 1, trm = 2) %>%
-#   mutate(fecha = as.Date(fecha), ret_trm = log(trm/lag(trm)))
+plazo_dias <- 1825   # plazo constante en días (1825 = 5 años); ajustar al nodo de curva usado
+names(tes_raw)[2]<-"z_tasa"
+tes_raw$z_tasa<-as.numeric(tes_raw$z_tasa)
+tes_raw <- tes_raw |>
+  mutate(
+    precio_tes = 100 / (1 + z_tasa)^(plazo_dias / 365),
+    ret_bond   = log(precio_tes / lag(precio_tes)) * 100  # rendimiento log, en % (misma escala que equity)
+  )
 
 # ==============================================================================
 # 2. CONSTRUCCIÓN DEL PANEL DE RENDIMIENTOS
@@ -73,7 +72,6 @@ equity_df <- data.frame(fecha = index(equity_px),
   select(fecha, ret_equity)
 
 tes_df <- tes_raw %>%
-  mutate(ret_bond = ret_bond * 100) %>%    # a puntos porcentuales, escala comparable
   select(fecha, ret_bond)
 
 # Unión por fecha común (alinea calendarios BVC vs. mercado de deuda)
@@ -108,6 +106,9 @@ p_optimo <- seleccion$selection["AIC(n)"]
 
 modelo_var <- VAR(datos_var, p = p_optimo, type = "const")
 summary(modelo_var)
+
+serial.test(modelo_var,lags.bg = 5,type="BG")
+serial.test(modelo_var,lags.pt=10,type="PT.asymptotic")
 
 # ==============================================================================
 # 5. CAUSALIDAD DE GRANGER
