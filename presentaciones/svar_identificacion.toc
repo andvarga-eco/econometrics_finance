@@ -1,0 +1,6 @@
+\babel@toc {spanish}{}\relax 
+\beamer@sectionintoc {1}{VAR reducido vs. VAR estructural}{3}{0}{1}
+\beamer@sectionintoc {2}{Relación entre SVAR y VAR reducido}{5}{0}{2}
+\beamer@sectionintoc {3}{El problema de identificación}{8}{0}{3}
+\beamer@sectionintoc {4}{Esquemas comunes de identificación}{12}{0}{4}
+\beamer@sectionintoc {5}{Resumen}{17}{0}{5}

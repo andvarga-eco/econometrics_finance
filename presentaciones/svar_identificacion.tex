@@ -1,0 +1,264 @@
+\documentclass[11pt]{beamer}
+
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+
+\title[Identificación en modelos SVAR]{Entendiendo y resolviendo el problema de identificación en modelos VAR estructurales}
+\author{}
+\date{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}{Contenido}
+\tableofcontents
+\end{frame}
+
+\section{VAR reducido vs. VAR estructural}
+
+\begin{frame}{VAR de forma reducida}
+\begin{itemize}
+    \item Cada variable se modela como función de:
+    \begin{itemize}
+        \item sus propios valores pasados,
+        \item los valores pasados de las demás variables del sistema.
+    \end{itemize}
+    \item Ventajas:
+    \begin{itemize}
+        \item Se estima fácilmente por MCO (OLS).
+        \item Es muy útil para pronosticar.
+    \end{itemize}
+    \item Problema clave: no permite separar el efecto que un choque en una variable tiene sobre las demás.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{VAR estructural (SVAR)}
+\begin{itemize}
+    \item Permite examinar relaciones \textbf{causales} entre variables.
+    \item Usa teoría económica para imponer restricciones estructurales.
+    \item Permite analizar el impacto de choques individuales sobre las demás variables del sistema.
+\end{itemize}
+\end{frame}
+
+\section{Relación entre SVAR y VAR reducido}
+
+\begin{frame}{Sistema estructural bivariado}
+Consideremos dos variables endógenas $Y_1$ y $Y_2$, modeladas a partir de:
+\begin{enumerate}
+    \item sus valores rezagados un periodo,
+    \item choques aleatorios propios $\epsilon_{1,t}$ y $\epsilon_{2,t}$.
+\end{enumerate}
+
+\begin{align*}
+y_{1,t} &= \phi_{11} y_{1,t-1} + \phi_{12} y_{2,t-1} + b_{11}\epsilon_{1,t} + b_{12}\epsilon_{2,t}\\
+y_{2,t} &= \phi_{21} y_{1,t-1} + \phi_{22} y_{2,t-1} + b_{21}\epsilon_{1,t} + b_{22}\epsilon_{2,t}
+\end{align*}
+
+Los choques $\epsilon_{1,t}, \epsilon_{2,t}$ son ruido blanco de media cero, no correlacionados serialmente y entre sí.
+\end{frame}
+
+\begin{frame}{La matriz $B$}
+La matriz
+\[
+B = \begin{bmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{bmatrix}
+\]
+captura el impacto \textbf{estructural} de los choques $\epsilon_{1,t}$ y $\epsilon_{2,t}$ sobre $Y_1$ y $Y_2$.
+
+\vspace{0.5cm}
+\textbf{Problema:} $\epsilon_{1,t}$ y $\epsilon_{2,t}$ no son observables $\Rightarrow$ no podemos estimar $B$ directamente.
+\end{frame}
+
+\begin{frame}{De la forma estructural a la forma reducida}
+Definimos los choques combinados:
+\begin{align*}
+u_{1,t} &= b_{11}\epsilon_{1,t} + b_{12}\epsilon_{2,t}\\
+u_{2,t} &= b_{21}\epsilon_{1,t} + b_{22}\epsilon_{2,t}
+\end{align*}
+
+El sistema se convierte en un VAR de forma reducida:
+\begin{align*}
+y_{1,t} &= \phi_{11} y_{1,t-1} + \phi_{12} y_{2,t-1} + u_{1,t}\\
+y_{2,t} &= \phi_{21} y_{1,t-1} + \phi_{22} y_{2,t-1} + u_{2,t}
+\end{align*}
+
+$\Phi$ se estima por MCO, pero los residuos $u_{1,t}, u_{2,t}$ no permiten identificar los efectos individuales de $\epsilon_{1,t}$ y $\epsilon_{2,t}$.
+\end{frame}
+
+\section{El problema de identificación}
+
+\begin{frame}{La identidad clave}
+En forma matricial: $U_t = B \epsilon_t$.
+
+A partir de esta relación se obtiene la identidad central del SVAR:
+\[
+\Sigma_u = B B'
+\]
+donde $\Sigma_u = \mathbb{E}[u_t' u_t]$ es la matriz de covarianzas de los residuos reducidos.
+\end{frame}
+
+\begin{frame}{¿Por qué hay un problema de identificación?}
+Con
+\[
+\Sigma_u = \begin{bmatrix} \sigma^2_{11} & \sigma^2_{12} \\ \sigma^2_{21} & \sigma^2_{22} \end{bmatrix}
+= \begin{bmatrix} b_{11} & b_{12} \\ b_{21} & b_{22} \end{bmatrix}
+\begin{bmatrix} b_{11} & b_{21} \\ b_{12} & b_{22} \end{bmatrix}
+\]
+
+se obtienen las ecuaciones:
+\begin{align*}
+\sigma^2_{11} &= b_{11}^2 + b_{12}^2\\
+\sigma^2_{12} &= b_{11}b_{21} + b_{12}b_{22}\\
+\sigma^2_{21} &= b_{11}b_{21} + b_{12}b_{22}\\
+\sigma^2_{22} &= b_{21}^2 + b_{22}^2
+\end{align*}
+
+Como $\sigma^2_{12}=\sigma^2_{21}$, solo hay \textbf{3 ecuaciones únicas} para \textbf{4 incógnitas}: el modelo está \textbf{subidentificado}.
+\end{frame}
+
+\begin{frame}{Solución: imponer restricciones}
+Para resolver el problema de subidentificación se necesitan ecuaciones adicionales, que provienen de \textbf{restricciones} basadas en teoría económica.
+
+Formas comunes de restricción:
+\begin{itemize}
+    \item Sin efectos de corto plazo.
+    \item Sin efectos de largo plazo.
+    \item Restricciones de signo.
+\end{itemize}
+
+\vspace{0.3cm}
+Ejemplo: la neutralidad monetaria implica que la política monetaria no tiene efectos acumulados de largo plazo sobre el PIB real.
+\end{frame}
+
+\begin{frame}{Ejemplos de estudios SVAR}
+\small
+\begin{tabular}{p{2.3cm}p{2.6cm}p{5.5cm}}
+\toprule
+\textbf{Autores} & \textbf{Tema} & \textbf{Restricciones} \\
+\midrule
+Kilian (2009) & Precios del petróleo & Sin impacto de corto plazo (1 mes) de demanda y precios sobre producción; producción sí afecta demanda en el corto plazo \\
+Stock \& Watson (2001) & Choques de política monetaria & Inflación depende solo de rezagos; tasa de fondos federales no afecta desempleo contemporáneamente \\
+Narayan et al. (2008) & Electricidad y PIB & Sin relación de corto plazo entre PIB real y consumo eléctrico \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\section{Esquemas comunes de identificación}
+
+\begin{frame}{Restricciones de corto plazo (Cholesky)}
+\begin{itemize}
+    \item Se asume que algunos choques no tienen efecto contemporáneo sobre una o más variables.
+    \item Ejemplo: un choque de política monetaria no afecta la demanda agregada de inmediato $\Rightarrow b_{12}=0$.
+\end{itemize}
+
+\[
+B = \begin{bmatrix} b_{11} & 0 \\ b_{21} & b_{22} \end{bmatrix}
+\]
+
+\begin{itemize}
+    \item Ordenando las variables adecuadamente, $B$ es triangular inferior.
+    \item Se obtiene mediante la \textbf{descomposición de Cholesky} de $\Sigma_u$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Restricciones de largo plazo (Blanchard--Quah)}
+En forma matricial: $Y_t = \Phi Y_{t-1} + B\epsilon_t$.
+
+El impacto de $\epsilon_t$ se acumula en el tiempo:
+\[
+\begin{array}{c|c}
+\text{Periodo} & \text{Impacto de } \epsilon_t \\
+\hline
+T & B\epsilon_t \\
+T+1 & \Phi B \epsilon_t \\
+T+2 & \Phi^2 B \epsilon_t \\
+\vdots & \vdots
+\end{array}
+\]
+
+El efecto acumulado de largo plazo:
+\[
+\sum_{i=0}^{\infty}\Phi^i B \epsilon_t = (1-\Phi)^{-1} B\, \epsilon_t \equiv C\,\epsilon_t
+\]
+\end{frame}
+
+\begin{frame}{Implementación de restricciones de largo plazo}
+\begin{itemize}
+    \item Se fijan en cero algunos elementos de la matriz $C = (1-\Phi)^{-1}B$.
+    \item Procedimiento:
+    \begin{enumerate}
+        \item Definir $\Omega = CC' = (1-\Phi)^{-1}B\big[(1-\Phi)^{-1}B\big]'$.
+        \item Obtener $C$ mediante la descomposición de Cholesky de $\Omega$.
+        \item Recuperar $B = (1-\Phi)\,C$.
+    \end{enumerate}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Restricciones de signo}
+\begin{itemize}
+    \item Se asume que ciertos choques generan únicamente incrementos o disminuciones en una o más variables.
+    \item Uso común: modelos de precios del petróleo (Kilian y Murphy, 2012).
+\end{itemize}
+
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Choque} & \textbf{Producción} & \textbf{Act. económica} & \textbf{Precio del petróleo} \\
+\midrule
+Caída en oferta de petróleo & $-$ & $-$ & $+$ \\
+Aumento en demanda agregada & $+$ & $+$ & $+$ \\
+Aumento en demanda específica & $+$ & $-$ & $+$ \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Algoritmo de restricciones de signo}
+Se emplea un método iterativo de ensayo y error para hallar una matriz de rotación $Q$ tal que $B = PQ$, con $P$ la descomposición de Cholesky de $\Sigma_u$.
+
+\begin{enumerate}
+    \item Generar aleatoriamente una matriz $Q$.
+    \item Calcular $P$ como la descomposición de Cholesky de $\Sigma_u$.
+    \item Calcular $B$ y los impactos de los choques asociados.
+    \item Verificar si los impactos cumplen las restricciones de signo:
+    \begin{itemize}
+        \item Si sí, conservar $Q$.
+        \item Si no, descartar $Q$.
+    \end{itemize}
+\end{enumerate}
+\end{frame}
+
+\section{Resumen}
+
+\begin{frame}{Resumen de los esquemas de identificación}
+\small
+\begin{tabular}{p{3cm}p{4.3cm}p{3.2cm}}
+\toprule
+\textbf{Método} & \textbf{Supuesto} & \textbf{Implementación} \\
+\midrule
+Efectos contemporáneos nulos & Algunos choques en $t$ no afectan variables en $t$ & $B$ triangular; Cholesky de $\Sigma_u$ \\
+Efectos de largo plazo nulos & Algunos choques no tienen efecto acumulado de largo plazo & Cholesky de $\Omega=CC'$; $B=(1-\Phi)C$ \\
+Restricciones de signo & Choques generan efectos de signo conocido & Búsqueda de $Q$ por ensayo y error \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Conclusiones}
+\begin{itemize}
+    \item El VAR reducido es fácil de estimar, pero no separa los efectos causales de los choques.
+    \item El SVAR permite identificar dichos efectos, pero enfrenta un problema de \textbf{subidentificación}: menos ecuaciones que incógnitas en $B$.
+    \item La solución requiere \textbf{restricciones} fundamentadas en teoría económica: de corto plazo, de largo plazo, o de signo.
+    \item La elección del esquema de identificación debe estar guiada por el marco teórico del fenómeno estudiado.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Referencia}
+Aptech Systems (2021, actualizado 2025). \emph{Understanding and Solving the Structural Vector Autoregressive Identification Problem}. \\
+\url{https://www.aptech.com/blog/understanding-and-solving-the-structural-vector-autoregressive-identification-problem/}
+\end{frame}
+
+\end{document}
